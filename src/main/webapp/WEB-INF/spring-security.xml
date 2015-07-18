@@ -77,7 +77,7 @@
 		<constructor-arg ref="clientDetails" />
 	</bean>
 	
-	<!-- Used for the persistenceof tokens (currently an in memory implementation) -->
+	<!-- Used for the persistence of tokens (currently an in memory implementation) -->
 	<bean id="tokenStore" class="org.springframework.security.oauth2.provider.token.InMemoryTokenStore" />
 
 	<!-- Used to create token and and every thing about them except for their persistence that is reposibility of TokenStore (Given here is a 			default implementation) -->
@@ -110,6 +110,8 @@
 
 	<oauth:client client-id="my-trusted-client-with-secret" authorized-grant-types="password,authorization_code,refresh_token,implicit"
 			secret="somesecret" authorities="ROLE_USER" />
+        <oauth:client client-id="$2a$04$ENAc7dKCyJGRodeoiM62C.V82otTEJXzv53bEEWXXAWrqys45iVvC" authorized-grant-types="password,authorization_code,refresh_token,implicit"
+                      secret="$2a$04$1nYamoXp5bw117fnm8ZUiudmGckplMmnGNar9AFCxWD6386HYn5Zu" authorities="ROLE_USER" />
 
 	</oauth:client-details-service>
 
