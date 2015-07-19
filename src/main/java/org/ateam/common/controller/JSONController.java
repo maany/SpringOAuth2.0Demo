@@ -7,8 +7,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.ateam.common.model.Person;
 
+/**
+ * class to mimic the protected FHIR resource
+ */
 @Controller
-@RequestMapping("/test")
+@RequestMapping("/fhir/person")
 public class JSONController {
 
 	@RequestMapping(value="{name}", method = RequestMethod.GET)
