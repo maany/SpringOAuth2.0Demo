@@ -16,7 +16,7 @@
 	<http pattern="/oauth/cache_approvals" security="none" xmlns="http://www.springframework.org/schema/security" />
 	<http pattern="/oauth/uncache_approvals" security="none" xmlns="http://www.springframework.org/schema/security" />
 
-	<http pattern="/oauth/token" create-session="stateless" authentication-manager-ref="clientAuthenticationManager"
+	<http pattern="/oauth/token.form" create-session="stateless" authentication-manager-ref="clientAuthenticationManager"
 		xmlns="http://www.springframework.org/schema/security">
 		<intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY" />
 		<anonymous enabled="false" />
@@ -28,13 +28,14 @@
  	
  	<!-- The OAuth2 protected resources are separated out into their own block so we can deal with authorization and error handling 
 		separately. This isn't mandatory, but it makes it easier to control the behaviour. -->
-	<http pattern="/test/*" create-session="never" entry-point-ref="oauthAuthenticationEntryPoint"
+<!--	<http pattern="/test/*" create-session="never" entry-point-ref="oauthAuthenticationEntryPoint"
 		access-decision-manager-ref="accessDecisionManager" xmlns="http://www.springframework.org/schema/security">
 		<anonymous enabled="false" />
 		<intercept-url pattern="/test/*" access="ROLE_USER" />
-		<!--<custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER" />-->
+		&lt;!&ndash;<custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER" />&ndash;&gt;
 		<access-denied-handler ref="oauthAccessDeniedHandler" />
 	</http>
+	-->
  
  	<bean id="oauthAuthenticationEntryPoint" class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
 		<property name="realmName" value="test" />
@@ -87,13 +88,14 @@
 		<property name="clientDetailsService" ref="clientDetails" />
 	</bean>
 
-	<bean id="userApprovalHandler" class="org.springframework.security.oauth2.provider.approval.TokenServicesUserApprovalHandler">
+<!--	<bean id="userApprovalHandler" class="org.springframework.security.oauth2.provider.approval.TokenServicesUserApprovalHandler">
 		<property name="tokenServices" ref="tokenServices" />
-	</bean>
+	</bean>-->
 
 	<!-- authorization-server aka AuthorizationServerTokenServices is an interface that defines everything necessary for token management -->
 	<oauth:authorization-server client-details-service-ref="clientDetails" token-services-ref="tokenServices"
-		user-approval-handler-ref="userApprovalHandler">
+            token-endpoint-url="/oauth/token.form">
+		<!--user-approval-handler-ref="userApprovalHandler">-->
 		<oauth:authorization-code />
 		<oauth:implicit />
 		<oauth:refresh-token />
