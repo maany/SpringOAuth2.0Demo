@@ -45,7 +45,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  *
  */
 @FrameworkEndpoint
-@RequestMapping(value = "/ws/oauth/token.form")
+@RequestMapping(value = "/oauth/token.form")
 public class TokenEndpoint extends AbstractEndpoint {
 
     @RequestMapping

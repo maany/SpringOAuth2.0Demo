@@ -14,7 +14,7 @@
     <servlet-mapping>
         <servlet-name>mvc-dispatcher</servlet-name>
         <!--<url-pattern>/oauth/*</url-pattern>-->
-        <url-pattern>/*</url-pattern>
+        <url-pattern>*.form</url-pattern>
     </servlet-mapping>
 
 	<context-param>
