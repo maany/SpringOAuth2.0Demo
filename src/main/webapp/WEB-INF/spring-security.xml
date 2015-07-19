@@ -16,7 +16,7 @@
 	<http pattern="/oauth/cache_approvals" security="none" xmlns="http://www.springframework.org/schema/security" />
 	<http pattern="/oauth/uncache_approvals" security="none" xmlns="http://www.springframework.org/schema/security" />
 
-	<http pattern="/oauth/token.form" create-session="stateless" authentication-manager-ref="clientAuthenticationManager"
+	<http pattern="/ws/oauth/token" create-session="stateless" authentication-manager-ref="clientAuthenticationManager"
 		xmlns="http://www.springframework.org/schema/security">
 		<intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY" />
 		<anonymous enabled="false" />
@@ -94,7 +94,7 @@
 
 	<!-- authorization-server aka AuthorizationServerTokenServices is an interface that defines everything necessary for token management -->
 	<oauth:authorization-server client-details-service-ref="clientDetails" token-services-ref="tokenServices"
-            token-endpoint-url="/oauth/token.form">
+            token-endpoint-url="/oauth/token">
 		<!--user-approval-handler-ref="userApprovalHandler">-->
 		<oauth:authorization-code />
 		<oauth:implicit />
