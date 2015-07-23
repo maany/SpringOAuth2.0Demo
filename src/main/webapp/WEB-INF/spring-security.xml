@@ -15,8 +15,8 @@
  	<!-- Just for testing... -->
 	<http pattern="/oauth/cache_approvals" security="none" xmlns="http://www.springframework.org/schema/security" />
 	<http pattern="/oauth/uncache_approvals" security="none" xmlns="http://www.springframework.org/schema/security" />
-
-	<http pattern="/ws/oauth/token" create-session="stateless" authentication-manager-ref="clientAuthenticationManager"
+	
+    <http pattern="/ws/oauth/token" create-session="stateless" authentication-manager-ref="clientAuthenticationManager"
 		xmlns="http://www.springframework.org/schema/security">
 		<intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY" />
 		<anonymous enabled="false" />
@@ -25,19 +25,26 @@
 		<custom-filter ref="clientCredentialsTokenEndpointFilter" after="BASIC_AUTH_FILTER" />
 		<access-denied-handler ref="oauthAccessDeniedHandler" />
 	</http>
- 	
  	<!-- The OAuth2 protected resources are separated out into their own block so we can deal with authorization and error handling 
 		separately. This isn't mandatory, but it makes it easier to control the behaviour. -->
-	<http  authentication-manager-ref="authenticationManager"
+	<http  authentication-manager-ref="authenticationManager" entry-point-ref="oauthAuthenticationEntryPoint"
         xmlns="http://www.springframework.org/schema/security">
 		<anonymous enabled="false" />
-		<intercept-url pattern="/ws/fhir/*" access="ROLE_USER" />
-        <form-login/>
+		<intercept-url pattern="/ws/fhir/**" access="ROLE_USER" />
+        <!--<form-login />-->
         <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER" />
-		<!--<access-denied-handler ref="oauthAccessDeniedHandler" />-->
+		<access-denied-handler ref="oauthAccessDeniedHandler" />
 	</http>
 
- 
+    <authentication-manager alias="authenticationManager" xmlns="http://www.springframework.org/schema/security">
+        <authentication-provider>
+            <user-service id="userDetailsService">
+                <user name="user" password="password" authorities="ROLE_USER" />
+            </user-service>
+        </authentication-provider>
+    </authentication-manager>
+
+
  	<bean id="oauthAuthenticationEntryPoint" class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
 		<property name="realmName" value="test" />
 	</bean>
@@ -67,13 +74,7 @@
 		<authentication-provider user-service-ref="clientDetailsUserService" />
 	</authentication-manager>
 
-	<authentication-manager alias="authenticationManager" xmlns="http://www.springframework.org/schema/security">
-		<authentication-provider>
-			<user-service id="userDetailsService">
-				<user name="user" password="password" authorities="ROLE_USER" />
-			</user-service>
-		</authentication-provider>
-	</authentication-manager>
+
 
 	<bean id="clientDetailsUserService" class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
 		<constructor-arg ref="clientDetails" />
@@ -126,5 +127,5 @@
 	<oauth:expression-handler id="oauthExpressionHandler" />
 
 	<oauth:web-expression-handler id="oauthWebExpressionHandler" />
-	
+
 </beans>
