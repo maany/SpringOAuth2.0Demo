@@ -16,7 +16,7 @@
     <http pattern="/oauth/cache_approvals" security="none" xmlns="http://www.springframework.org/schema/security"/>
     <http pattern="/oauth/uncache_approvals" security="none" xmlns="http://www.springframework.org/schema/security"/>
 
-    <http pattern="/oauth/token" create-session="stateless" authentication-manager-ref="clientAuthenticationManager"
+    <http pattern="/ws/oauth/token" create-session="stateless" authentication-manager-ref="clientAuthenticationManager"
           xmlns="http://www.springframework.org/schema/security">
         <intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY"/>
         <anonymous enabled="false"/>
@@ -27,7 +27,7 @@
     </http>
     <!-- The OAuth2 protected resources are separated out into their own block so we can deal with authorization and error handling
        separately. This isn't mandatory, but it makes it easier to control the behaviour. -->
-    <http  pattern="/ws/**" authentication-manager-ref="authenticationManager" entry-point-ref="oauthAuthenticationEntryPoint"
+    <http  pattern="/ws/fhir/**" authentication-manager-ref="authenticationManager" entry-point-ref="oauthAuthenticationEntryPoint"
           xmlns="http://www.springframework.org/schema/security">
         <anonymous enabled="false"/>
         <intercept-url pattern="/ws/fhir/**" access="ROLE_USER"/>
@@ -36,6 +36,13 @@
         <access-denied-handler ref="oauthAccessDeniedHandler"/>
     </http>
 
+    <http access-denied-page="/login.jsp?authorization_error=true" disable-url-rewriting="true"
+          xmlns="http://www.springframework.org/schema/security">
+        <intercept-url pattern="/ws/oauth/**" access="ROLE_USER" />
+        <intercept-url pattern="/ws/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+
+        <form-login />
+    </http>
 
     <authentication-manager alias="authenticationManager" xmlns="http://www.springframework.org/schema/security">
         <authentication-provider>
@@ -45,13 +52,6 @@
         </authentication-provider>
     </authentication-manager>
 
-    <http access-denied-page="/login.jsp?authorization_error=true" disable-url-rewriting="true"
-          xmlns="http://www.springframework.org/schema/security">
-        <intercept-url pattern="/oauth/**" access="ROLE_USER" />
-        <intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
-
-        <form-login />
-    </http>
 
     <bean id="oauthAuthenticationEntryPoint"
           class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
@@ -107,7 +107,7 @@
 
     <!-- authorization-server aka AuthorizationServerTokenServices is an interface that defines everything necessary for token management -->
     <oauth:authorization-server client-details-service-ref="clientDetails" token-services-ref="tokenServices"
-                                token-endpoint-url="/oauth/token" user-approval-handler-ref="userApprovalHandler" >
+                                 user-approval-handler-ref="userApprovalHandler" user-approval-page="access_confirmation" approval-parameter-name="user_oauth_approval">
         <!--error-page="/ws/oauth/error">-->
         <oauth:authorization-code />
         <oauth:implicit/>

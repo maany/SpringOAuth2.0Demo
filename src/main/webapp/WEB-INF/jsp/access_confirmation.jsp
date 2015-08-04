@@ -33,11 +33,11 @@
 
 <c:remove scope="session" var="SPRING_SECURITY_LAST_EXCEPTION"/>
 <authz:authorize access="hasRole('ROLE_USER')">
-    <form id="confirmationForm" name="confirmationForm" action="<%=request.getContextPath()%>/oauth/authorize" method="post">
+    <form id="confirmationForm" name="confirmationForm" action="<%=request.getContextPath()%>/ws/oauth/authorize" method="post">
         <input name="user_oauth_approval" value="true" type="hidden"/>
         <label><input name="authorize" value="Authorize" type="submit"></label>
     </form>
-    <form id="denialForm" name="denialForm" action="<%=request.getContextPath()%>/oauth/authorize" method="post">
+    <form id="denialForm" name="denialForm" action="<%=request.getContextPath()%>/ws/oauth/authorize" method="post">
         <input name="user_oauth_approval" value="false" type="hidden"/>
         <label><input name="deny" value="Deny" type="submit"></label>
     </form>

@@ -22,7 +22,7 @@
 
     <p class="error">You are not permitted to access that resource.</p>
 </c:if>
-
+<h1>If you can see this, then custom login form is working</h1>If
 <form id="loginForm" name="loginForm"
       action="<c:url value="/login.do"/>" method="post">
     <p>
