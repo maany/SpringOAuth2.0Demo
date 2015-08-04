@@ -16,7 +16,7 @@
     <http pattern="/oauth/cache_approvals" security="none" xmlns="http://www.springframework.org/schema/security"/>
     <http pattern="/oauth/uncache_approvals" security="none" xmlns="http://www.springframework.org/schema/security"/>
 
-    <http pattern="/ws/oauth/token" create-session="stateless" authentication-manager-ref="clientAuthenticationManager"
+    <http pattern="/oauth/token" create-session="stateless" authentication-manager-ref="clientAuthenticationManager"
           xmlns="http://www.springframework.org/schema/security">
         <intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY"/>
         <anonymous enabled="false"/>
@@ -35,13 +35,7 @@
         <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
         <access-denied-handler ref="oauthAccessDeniedHandler"/>
     </http>
-    <http access-denied-page="/login.jsp?authorization_error=true" disable-url-rewriting="true"
-          xmlns="http://www.springframework.org/schema/security">
-        <intercept-url pattern="/oauth/**" access="ROLE_USER" />
-        <intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
 
-        <form-login />
-    </http>
 
     <authentication-manager alias="authenticationManager" xmlns="http://www.springframework.org/schema/security">
         <authentication-provider>
@@ -51,6 +45,13 @@
         </authentication-provider>
     </authentication-manager>
 
+    <http access-denied-page="/login.jsp?authorization_error=true" disable-url-rewriting="true"
+          xmlns="http://www.springframework.org/schema/security">
+        <intercept-url pattern="/oauth/**" access="ROLE_USER" />
+        <intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+
+        <form-login />
+    </http>
 
     <bean id="oauthAuthenticationEntryPoint"
           class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
