@@ -46,7 +46,7 @@
     <authentication-manager alias="authenticationManager" xmlns="http://www.springframework.org/schema/security">
         <authentication-provider>
             <user-service id="userDetailsService">
-                <user name="user" password="password" authorities="ROLE_USER"/>
+                <user name="user1" password="password" authorities="ROLE_USER"/>
             </user-service>
         </authentication-provider>
     </authentication-manager>
