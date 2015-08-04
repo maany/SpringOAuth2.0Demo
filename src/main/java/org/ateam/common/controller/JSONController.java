@@ -19,7 +19,6 @@ public class JSONController {
 
 		Person person = new Person();
 		person.setName(name);
-		
 		return person;
 	}
 	
