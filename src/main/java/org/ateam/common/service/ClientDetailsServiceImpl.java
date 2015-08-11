@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
@@ -18,14 +19,16 @@ import java.util.Set;
 /**
  * Created by OPSKMC on 8/9/15.
  */
-@Service
+
 public class ClientDetailsServiceImpl implements ClientDetailsService {
     @Autowired
     ClientDAO dao;
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     public ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException {
+        System.out.println("Fetching client details for " + clientId);
         Client client = dao.loadClientByClientId(clientId);
+        System.out.println(client.toString());
         return client;
     }
     @Transactional
@@ -36,13 +39,16 @@ public class ClientDetailsServiceImpl implements ClientDetailsService {
     public void updateClient(Client client){
         dao.updateClient(client);
     }
-    @Transactional
-    public void getClientById(Integer id){
-        dao.getClientById(id);
+    @Transactional(readOnly = true,propagation = Propagation.REQUIRED)
+    public Client getClientById(Integer id){
+        Client client = (Client)dao.getClientById(id);
+        System.out.println(client.toString());
+        return client;
     }
     @Transactional
     public void deleteClient(Client client){
         dao.deleteClient(client);
+
     }
 
 }

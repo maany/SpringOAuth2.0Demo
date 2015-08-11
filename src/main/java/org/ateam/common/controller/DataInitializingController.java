@@ -1,8 +1,11 @@
 package org.ateam.common.controller;
 
+import org.ateam.common.model.Client;
 import org.ateam.common.model.User;
+import org.ateam.common.service.ClientDetailsServiceImpl;
 import org.ateam.common.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +18,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class DataInitializingController {
     @Autowired
     UserService userService;
+    @Autowired
+    ClientDetailsServiceImpl clientDetailsService;
     @RequestMapping(value = "/initUsers")
     public
     @ResponseBody
@@ -36,4 +41,23 @@ public class DataInitializingController {
         }
         return response;
     }
+    @RequestMapping(value= "/initClients")
+    public
+    @ResponseBody
+    String initClients(ModelMap map){
+        String response = "Failed to add clients";
+        Client client = new Client("my-trusted-client-with-secret","somesecret","openmrs","read,write","password,authorization_code,implicit,client_credentials,refresh_token","ROLE_CLIENT","http://anywhere?key=value");
+        Client client2 = new Client("openmrs-client","secret","openmrs","read,write","password,authorization_code,implicit,client_credentials,refresh_token","ROLE_CLIENT","http://anywhere?key=value");
+        try{
+            clientDetailsService.saveOrUpdateClient(client);
+            clientDetailsService.saveOrUpdateClient(client2);
+            response = "Clients added successfully";
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        return response;
+    }
+
+
+
 }

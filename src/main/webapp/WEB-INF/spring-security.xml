@@ -121,8 +121,9 @@
 
     <oauth:resource-server id="resourceServerFilter" resource-id="test" token-services-ref="tokenServices"/>
     <!-- ClientsDeailsService: Entry Point to clients database (given is in memory implementation) -->
-    <oauth:client-details-service id="clientDetails">
-        <!-- client -->
+    <bean id="clientDetails" class="org.ateam.common.service.ClientDetailsServiceImpl"/>
+<!--    <oauth:client-details-service id="clientDetails">
+        &lt;!&ndash; client &ndash;&gt;
         <oauth:client client-id="the_client" authorized-grant-types="authorization_code,client_credentials"
                       authorities="ROLE_USER" scope="read,write,trust" secret="secret"/>
 
@@ -140,7 +141,7 @@
                       authorities="ROLE_CLIENT"
                       scope="read" secret="secret"/>
 
-    </oauth:client-details-service>
+    </oauth:client-details-service>-->
 
     <sec:global-method-security pre-post-annotations="enabled" proxy-target-class="true">
         <!--you could also wire in the expression handler up at the layer of the http filters. See https://jira.springsource.org/browse/SEC-1452 -->

@@ -97,10 +97,10 @@ public class Client  implements ClientDetails{
     protected Client(){
 
     }
-    public Client(String clientId, String resourceIds, String scopes, String grantTypes, String authorities,
+    public Client(String clientId, String clientSecret,String resourceIds, String scopes, String grantTypes, String authorities,
                   String redirectUris) {
-
         this.clientIdentifier = clientId;
+        this.clientSecret = clientSecret;
 
         if (StringUtils.hasText(resourceIds)) {
             Set<String> resources = StringUtils.commaDelimitedListToSet(resourceIds);
@@ -231,7 +231,7 @@ public class Client  implements ClientDetails{
     public void setLegalAcceptance(boolean legalAcceptance) {
         this.legalAcceptance = legalAcceptance;
     }
-
+    @Override
     public String getClientSecret() {
         return clientSecret;
     }
