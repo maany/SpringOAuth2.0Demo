@@ -21,13 +21,15 @@ import java.util.Set;
  */
 
 public class ClientDetailsServiceImpl implements ClientDetailsService {
+    public static final String REQUEST_SOURCE= ClientDetailsServiceImpl.class.getName();
     @Autowired
     ClientDAO dao;
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException {
-        System.out.println("Fetching client details for " + clientId);
+        System.out.println("***Fetching client details for " + clientId);
         Client client = dao.loadClientByClientId(clientId);
+        client.getAdditionalInformation().put("REQUEST_SOURCE",REQUEST_SOURCE);
         System.out.println(client.toString());
         return client;
     }

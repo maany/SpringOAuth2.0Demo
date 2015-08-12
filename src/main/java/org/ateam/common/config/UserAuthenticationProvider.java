@@ -38,7 +38,7 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
     }
 
     @Override
-    public boolean supports(Class<?> authorities) {
-        return authorities.equals(UsernamePasswordAuthenticationToken.class);
+    public boolean supports(Class<?> authentication) {
+        return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
     }
 }

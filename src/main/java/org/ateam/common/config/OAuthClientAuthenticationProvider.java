@@ -24,10 +24,18 @@ public class OAuthClientAuthenticationProvider implements AuthenticationProvider
         System.out.println("*** Client Identifier from form :" + username);
         // password verification
         Client client = (Client)clientDetailsService.loadClientByClientId(username);
+        System.out.println("***Comparing Client Secret : " + client.getClientSecret() + " and " + password);
         if(client.getClientSecret().equals(password)){
         //if(password validated)
+            System.out.println("***Normal password case");
+            return new UsernamePasswordAuthenticationToken(username,password,client.getAuthorities());
+
+        }else if(client.getAdditionalInformation().get("REQUEST_SOURCE").equals(ClientDetailsServiceImpl.REQUEST_SOURCE)){
+            System.out.println("***Null password case");
+            client.getAdditionalInformation().remove("REQUEST_SOURCE");
             return new UsernamePasswordAuthenticationToken(username,password,client.getAuthorities());
         }else {
+            System.out.println("***Invalid case");
             return null;
         }
 
@@ -35,6 +43,7 @@ public class OAuthClientAuthenticationProvider implements AuthenticationProvider
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(UsernamePasswordAuthenticationToken.class);
+        return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
+        //return authentication.equals(UsernamePasswordAuthenticationToken.class);
     }
 }
