@@ -18,7 +18,8 @@ import java.util.*;
  */
 @Entity(name = "client")
 @Table(name = "oauth2_client")
-public class Client  implements ClientDetails{
+
+public class Client  extends BaseOpenMRSData implements ClientDetails{
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -45,10 +46,12 @@ public class Client  implements ClientDetails{
     private String clientIdentifier;
     @Column(name = "client_secret")
     private String clientSecret;
+
     private String website;
 
-    @Column(name = "legal_acceptance")
-    private boolean legalAcceptance;
+    // ================================
+    // Fields from ClientDetailsService
+    // ================================
 
     @ElementCollection
     @JoinTable(name = "oauth2_client_resource_ids", joinColumns = @JoinColumn(name = "resource_id_key"))
@@ -94,6 +97,9 @@ public class Client  implements ClientDetails{
 
     private Integer accessTokenValiditySeconds;
 
+    // ============
+    // Constructors
+    // ============
     protected Client(){
 
     }
@@ -131,13 +137,8 @@ public class Client  implements ClientDetails{
             this.registeredRedirectUris = StringUtils.commaDelimitedListToSet(redirectUris);
         }
     }
-    public void setAccessTokenValiditySeconds(Integer accessTokenValiditySeconds) {
-        this.accessTokenValiditySeconds = accessTokenValiditySeconds;
-    }
 
-    public void setRefreshTokenValiditySeconds(Integer refreshTokenValiditySeconds) {
-        this.refreshTokenValiditySeconds = refreshTokenValiditySeconds;
-    }
+
 
 
     public User getClientDeveloper() {
@@ -146,26 +147,6 @@ public class Client  implements ClientDetails{
 
     public void setClientDeveloper(User clientDeveloper) {
         this.clientDeveloper = clientDeveloper;
-    }
-
-
-    @Override
-    public String getClientId() {
-        return getClientIdentifier();
-    }
-
-    @Override
-    public Set<String> getResourceIds() {
-        return resourceIds;
-    }
-
-    @Override
-    public boolean isSecretRequired() {
-        return this.clientSecret != null;
-    }
-
-    public void setClientId(String clientId) {
-        setClientIdentifier(clientId);
     }
 
     public Integer getId() {
@@ -224,16 +205,35 @@ public class Client  implements ClientDetails{
         this.website = website;
     }
 
-    public boolean isLegalAcceptance() {
-        return legalAcceptance;
+    //==========================================
+    // Getters/ Setters for ClientDetailsService
+    //==========================================
+    public void setAccessTokenValiditySeconds(Integer accessTokenValiditySeconds) {
+        this.accessTokenValiditySeconds = accessTokenValiditySeconds;
     }
 
-    public void setLegalAcceptance(boolean legalAcceptance) {
-        this.legalAcceptance = legalAcceptance;
+    public void setRefreshTokenValiditySeconds(Integer refreshTokenValiditySeconds) {
+        this.refreshTokenValiditySeconds = refreshTokenValiditySeconds;
+    }
+
+    public void setClientId(String clientId) {
+        setClientIdentifier(clientId);
     }
     @Override
-    public String getClientSecret() {
+    public String getClientId() {
+        return getClientIdentifier();
+    }
+    public String getClientSecret(){
         return clientSecret;
+    }
+    @Override
+    public Set<String> getResourceIds() {
+        return resourceIds;
+    }
+
+    @Override
+    public boolean isSecretRequired() {
+        return this.clientSecret != null;
     }
 
     @Override
@@ -276,6 +276,28 @@ public class Client  implements ClientDetails{
         return additionalInformation;
     }
 
+    @Override
+    public boolean isRetired() {
+           return retired;
+    }
+    @Column(name="retired")
+    @Access(AccessType.PROPERTY)
+    public void getRetired(boolean retired){
+        System.out.println("*** Setting retired");
+        this.retired= retired;
+    }
+
+    @Override
+    @Access(AccessType.PROPERTY)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "creator_id")
+    public User getCreator(){
+        return creator;
+    }
+    @Override
+    public void setCreator(User creator){
+        super.setCreator(creator);
+    }
     public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
     }

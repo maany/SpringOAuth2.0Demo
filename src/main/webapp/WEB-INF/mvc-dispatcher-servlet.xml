@@ -32,6 +32,11 @@
                 <value>classpath:hibernate.cfg.xml</value>
             </list>
         </property>-->
+        <property name="mappingResources">
+            <list>
+                <!--<value>Client.hbm.xml</value>-->
+            </list>
+        </property>
         <property name="packagesToScan">
             <list>
                 <value>org.ateam.common.model</value>
