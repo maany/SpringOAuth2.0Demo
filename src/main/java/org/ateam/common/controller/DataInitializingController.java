@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -57,7 +59,13 @@ public class DataInitializingController {
         }
         return response;
     }
-
+    @RequestMapping(value = "/client/{id}")
+    public
+    @ResponseBody
+    String getClient(@PathVariable int id, ModelMap map){
+        Client client  = clientDetailsService.getClientById(id);
+        return client.toString();
+    }
 
 
 }
