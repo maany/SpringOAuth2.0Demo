@@ -1,12 +1,8 @@
 package org.ateam.common.model;
 
+import org.ateam.common.utils.ClientSpringOAuthUtils;
 import org.ateam.common.utils.CustomAuthorityUtils;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.hibernate.annotations.CollectionId;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.util.StringUtils;
@@ -53,57 +49,20 @@ public class Client  extends BaseOpenMRSData implements ClientDetails{
     // ================================
     // Fields from ClientDetailsService
     // ================================
+    @OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
+    private Collection<Resource> resources;
+    @OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
+    private Collection<Scope> scopes;
+    @OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
+    private Collection<CustomGrantedAuthority> authorities;
+    @OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
+    private Collection<RedirectURI> registeredRedirectUris;
+    @OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
+    private Collection<AuthorizedGrantType> authorizedGrantTypes;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "oauth2_client_resource_ids", joinColumns = @JoinColumn(name="client_id"))
-    @Column(name="resource_ids")
-   // @JoinTable(name = "oauth2_client_resource_ids", inverseJoinColumns = @JoinColumn(name = "resource_id_key"),joinColumns = @JoinColumn(name="client_id"))
- //   @GenericGenerator(name="hilo-gen", strategy="hilo")
-   // @CollectionId(columns = {@Column(name = "resource_id_primary_key")},generator = "hilo-gen",type = @Type(type = "long"))
-    private Set<String> resourceIds = new HashSet<String>();
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "oauth2_client_scopes", joinColumns = @JoinColumn(name="client_id"))
-    @Column(name="scope")
-//    @JoinTable(name = "oauth2_client_scopes", inverseJoinColumns = @JoinColumn(name = "scope_key"),joinColumns = @JoinColumn(name="client_id"))
-    //@GenericGenerator(name="hilo-gen", strategy="hilo")
-    //@CollectionId(columns = {@Column(name = "scope_primary_key")},generator = "hilo-gen",type = @Type(type = "long"))
-    private Set<String> scope = new HashSet<String>();
-
-    @ElementCollection(fetch = FetchType.EAGER) //todo make this ManyToOne
-    @CollectionTable(name = "oauth2_client_granted_authorites", joinColumns = @JoinColumn(name="client_id"))
-    @Column(name="granted_authorities")
-//    @JoinTable(name = "oauth2_client_authorities", inverseJoinColumns = @JoinColumn(name = "authorities_key"),joinColumns = @JoinColumn(name="client_id"))
-    //@GenericGenerator(name="hilo-gen", strategy="hilo")
-    //@CollectionId(columns = {@Column(name = "authorities_primary_key")},generator = "hilo-gen",type = @Type(type = "long"))
-    private Collection<SimpleGrantedAuthority> authorities = new HashSet<SimpleGrantedAuthority>();
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "oauth2_client_redirect_uri", joinColumns = @JoinColumn(name="client_id"))
-    @Column(name="redirect_uri")
-//    @JoinTable(name = "oauth2_client_redirect_uri", inverseJoinColumns = @JoinColumn(name = "redirect_uri_key"),joinColumns = @JoinColumn(name="client_id"))
-    //@GenericGenerator(name="hilo-gen", strategy="hilo")
-    //@CollectionId(columns = {@Column(name = "redirect_uri_primary_key")},generator = "hilo-gen",type = @Type(type = "long"))
-    private Set<String> registeredRedirectUris = new HashSet<String>();
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "oauth2_client_grant_types", joinColumns = @JoinColumn(name="client_id"))
-    @Column(name="grant_types")
-//    @JoinTable(name = "oauth2_client_grant_types", inverseJoinColumns = @JoinColumn(name = "grant_types_key"),joinColumns = @JoinColumn(name="client_id"))
-    //@GenericGenerator(name="hilo-gen", strategy="hilo")
-    //@CollectionId(columns = {@Column(name = "grant_types_primary_key")},generator = "hilo-gen",type = @Type(type = "long"))
-    private Set<String> authorizedGrantTypes = new HashSet<String>();
-
-    /**
-     * All additional properties have been defined before-hand. This variable will be deprecated soon
-     * It is transient because Hibernate cannot persist ElementCollection of type Object
-     * It is being used as a placeholder only, to be returned by the method {@link org.springframework.security.oauth2.provider.ClientDetails#getAdditionalInformation()}
-     */
-    //@ElementCollection
     @Transient
     private Map<String, Object> additionalInformation = new LinkedHashMap<String, Object>();
 
-    //@JsonProperty("refresh_token_validity")
     private Integer refreshTokenValiditySeconds;
 
     private Integer accessTokenValiditySeconds;
@@ -120,32 +79,29 @@ public class Client  extends BaseOpenMRSData implements ClientDetails{
         this.clientSecret = clientSecret;
 
         if (StringUtils.hasText(resourceIds)) {
-            Set<String> resources = StringUtils.commaDelimitedListToSet(resourceIds);
-            if (!resources.isEmpty()) {
-                this.resourceIds = resources;
-            }
+                this.resources = ClientSpringOAuthUtils.commaDelimitedStringToCollection(resourceIds,this,Resource.class);
         }
 
         if (StringUtils.hasText(scopes)) {
-            Set<String> scopeList = StringUtils.commaDelimitedListToSet(scopes);
-            if (!scopeList.isEmpty()) {
-                this.scope = scopeList;
-            }
+                this.scopes = ClientSpringOAuthUtils.commaDelimitedStringToCollection(scopes,this,Scope.class);
         }
 
         if (StringUtils.hasText(grantTypes)) {
-            this.authorizedGrantTypes = StringUtils.commaDelimitedListToSet(grantTypes);
+            this.authorizedGrantTypes = ClientSpringOAuthUtils.commaDelimitedStringToCollection(grantTypes,this,AuthorizedGrantType.class);
         }
         else {
-            this.authorizedGrantTypes = new HashSet<String>(Arrays.asList("authorization_code", "refresh_token"));
+            AuthorizedGrantType authorizationCode = new AuthorizedGrantType("authorization_code");
+            AuthorizedGrantType refreshToken = new AuthorizedGrantType("refresh_token");
+            this.authorizedGrantTypes.add(authorizationCode);
+            this.authorizedGrantTypes.add(refreshToken);
         }
 
         if (StringUtils.hasText(authorities)) {
-            this.authorities = CustomAuthorityUtils.commaSeparatedStringToAuthorityList(authorities);
+            this.authorities = ClientSpringOAuthUtils.commaDelimitedStringToCollection(authorities,this,CustomGrantedAuthority.class);
         }
 
         if (StringUtils.hasText(redirectUris)) {
-            this.registeredRedirectUris = StringUtils.commaDelimitedListToSet(redirectUris);
+            this.registeredRedirectUris = ClientSpringOAuthUtils.commaDelimitedStringToCollection(redirectUris,this,RedirectURI.class);
         }
     }
 
@@ -219,6 +175,43 @@ public class Client  extends BaseOpenMRSData implements ClientDetails{
     //==========================================
     // Getters/ Setters for ClientDetailsService
     //==========================================
+
+    public Collection<Resource> getResources() {
+        return resources;
+    }
+
+    public void setResources(Collection<Resource> resources) {
+        this.resources = resources;
+    }
+
+    public Collection<Scope> getScopes() {
+        return scopes;
+    }
+
+    public void setScopes(Collection<Scope> scopes) {
+        this.scopes = scopes;
+    }
+
+    public void setAuthorities(Collection<CustomGrantedAuthority> authorities) {
+        this.authorities = authorities;
+    }
+
+    public Collection<RedirectURI> getRegisteredRedirectUris() {
+        return registeredRedirectUris;
+    }
+
+    public void setRegisteredRedirectUris(Collection<RedirectURI> registeredRedirectUris) {
+        this.registeredRedirectUris = registeredRedirectUris;
+    }
+
+    public void setAuthorizedGrantTypes(Collection<AuthorizedGrantType> authorizedGrantTypes) {
+        this.authorizedGrantTypes = authorizedGrantTypes;
+    }
+
+    public void setAdditionalInformation(Map<String, Object> additionalInformation) {
+        this.additionalInformation = additionalInformation;
+    }
+
     public void setAccessTokenValiditySeconds(Integer accessTokenValiditySeconds) {
         this.accessTokenValiditySeconds = accessTokenValiditySeconds;
     }
@@ -239,7 +232,7 @@ public class Client  extends BaseOpenMRSData implements ClientDetails{
     }
     @Override
     public Set<String> getResourceIds() {
-        return resourceIds;
+        return ClientSpringOAuthUtils.parseResources(resources);
     }
 
     @Override
@@ -249,27 +242,27 @@ public class Client  extends BaseOpenMRSData implements ClientDetails{
 
     @Override
     public boolean isScoped() {
-        return this.scope != null && !this.scope.isEmpty();
+        return this.scopes != null && !this.scopes.isEmpty();
     }
 
     @Override
     public Set<String> getScope() {
-        return scope;
+        return ClientSpringOAuthUtils.parseScope(scopes);
     }
 
     @Override
     public Set<String> getAuthorizedGrantTypes() {
-        return authorizedGrantTypes;
+        return ClientSpringOAuthUtils.parseAuthorizedGrantTypes(authorizedGrantTypes);
     }
 
     @Override
     public Set<String> getRegisteredRedirectUri() {
-        return registeredRedirectUris;
+        return ClientSpringOAuthUtils.parseRedirectURIs(registeredRedirectUris);
     }
 
     @Override
     public Collection<GrantedAuthority> getAuthorities() {
-        return CustomAuthorityUtils.simpleGrantedAuthorityListToGrantedAuthorityList(authorities);
+        return ClientSpringOAuthUtils.parseAuthorities(authorities);
     }
 
     @Override
@@ -322,8 +315,8 @@ public class Client  extends BaseOpenMRSData implements ClientDetails{
         result = prime * result + ((clientIdentifier == null) ? 0 : clientIdentifier.hashCode());
         result = prime * result + ((clientSecret == null) ? 0 : clientSecret.hashCode());
         result = prime * result + ((registeredRedirectUris == null) ? 0 : registeredRedirectUris.hashCode());
-        result = prime * result + ((resourceIds == null) ? 0 : resourceIds.hashCode());
-        result = prime * result + ((scope == null) ? 0 : scope.hashCode());
+        result = prime * result + ((resources == null) ? 0 : resources.hashCode());
+        result = prime * result + ((scopes == null) ? 0 : scopes.hashCode());
         result = prime * result + additionalInformation.hashCode();
         return result;
     }
@@ -371,17 +364,17 @@ public class Client  extends BaseOpenMRSData implements ClientDetails{
         }
         else if (!registeredRedirectUris.equals(other.registeredRedirectUris))
             return false;
-        if (resourceIds == null) {
-            if (other.resourceIds != null)
+        if (resources == null) {
+            if (other.resources != null)
                 return false;
         }
-        else if (!resourceIds.equals(other.resourceIds))
+        else if (!resources.equals(other.resources))
             return false;
-        if (scope == null) {
-            if (other.scope != null)
+        if (scopes == null) {
+            if (other.scopes != null)
                 return false;
         }
-        else if (!scope.equals(other.scope))
+        else if (!scopes.equals(other.scopes))
             return false;
         if (additionalInformation == null) {
             if (other.additionalInformation != null)
@@ -395,15 +388,15 @@ public class Client  extends BaseOpenMRSData implements ClientDetails{
     @Override
     public String toString() {
         String auths="";
-        for(SimpleGrantedAuthority auth:authorities)
+        for(GrantedAuthority auth:authorities)
             auths +=auth.toString() + " ";
-        return "Client [clientId=" + clientIdentifier + ", clientSecret=" + clientSecret + ", scope=" + scope
-                + ", resourceIds=" + resourceIds + ", authorizedGrantTypes=" + authorizedGrantTypes
+        return "Client [clientId=" + clientIdentifier + ", clientSecret=" + clientSecret + ", scope=" + scopes
+                + ", resourceIds=" + resources + ", authorizedGrantTypes=" + authorizedGrantTypes
                 + ", registeredRedirectUris=" + registeredRedirectUris + ", authorities=" + authorities
                 + ", accessTokenValiditySeconds=" + accessTokenValiditySeconds + ", refreshTokenValiditySeconds="
                 + refreshTokenValiditySeconds + ", additionalInformation=" + additionalInformation + "]"
                 + "\n\n"
-                + "scopes : " + scope.size() + "\n"
+                + "scopes : " + scopes.size() + "\n"
                 + "granted auth : " + auths;
     }
 }

@@ -34,4 +34,7 @@ public class ClientDAO {
             return null;
         return clients.get(0);
     }
+    public void persistClient(Client client){
+        sessionFactory.getCurrentSession().persist(client);
+    }
 }

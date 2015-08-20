@@ -52,5 +52,9 @@ public class ClientDetailsServiceImpl implements ClientDetailsService {
         dao.deleteClient(client);
 
     }
+    @Transactional
+    public void persistClient(Client client){
+        dao.persistClient(client);
+    }
 
 }

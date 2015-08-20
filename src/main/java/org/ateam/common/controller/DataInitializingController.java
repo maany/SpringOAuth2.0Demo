@@ -51,7 +51,7 @@ public class DataInitializingController {
         Client client = new Client("my-trusted-client-with-secret","somesecret","openmrs","read,write","password,authorization_code,implicit,client_credentials,refresh_token","ROLE_CLIENT","http://anywhere?key=value");
         Client client2 = new Client("openmrs-client","secret","openmrs","read,write","password,authorization_code,implicit,client_credentials,refresh_token","ROLE_CLIENT","http://anywhere?key=value");
         try{
-            clientDetailsService.saveOrUpdateClient(client);
+            clientDetailsService.persistClient(client);
             clientDetailsService.saveOrUpdateClient(client2);
             response = "Clients added successfully";
         }catch(Exception ex){
