@@ -48,8 +48,8 @@ public class DataInitializingController {
     @ResponseBody
     String initClients(ModelMap map){
         String response = "Failed to add clients";
-        Client client = new Client("my-trusted-client-with-secret","somesecret","openmrs","read,write","password,authorization_code,implicit,client_credentials,refresh_token","ROLE_CLIENT","http://anywhere?key=value");
-        Client client2 = new Client("openmrs-client","secret","openmrs","read,write","password,authorization_code,implicit,client_credentials,refresh_token","ROLE_CLIENT","http://anywhere?key=value");
+        Client client = new Client("my-trusted-client-with-secret","somesecret","test","read,write","password,authorization_code,implicit,client_credentials,refresh_token","ROLE_CLIENT","http://anywhere?key=value");
+        Client client2 = new Client("openmrs-client","secret","test","read,write","password,authorization_code,implicit,client_credentials,refresh_token","ROLE_CLIENT","http://anywhere?key=value");
         try{
             clientDetailsService.persistClient(client);
             clientDetailsService.saveOrUpdateClient(client2);

@@ -3,7 +3,6 @@ package org.ateam.common.utils;
 import org.ateam.common.model.*;
 import org.springframework.security.core.GrantedAuthority;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashSet;
@@ -43,10 +42,10 @@ public class ClientSpringOAuthUtils {
         return redirectURISet;
     }
 
-    public static Set<String> parseAuthorizedGrantTypes(Collection<AuthorizedGrantType> authorizedGrantTypes) {
+    public static Set<String> parseAuthorizedGrantTypes(Collection<CustomGrantType> customGrantTypes) {
         Set<String> authorizedGrantTypeSet = new HashSet<String>();
-        for (AuthorizedGrantType authorizedGrantType : authorizedGrantTypes) {
-            authorizedGrantTypeSet.add(authorizedGrantType.getAuthorizedGrantType());
+        for (CustomGrantType customGrantType : customGrantTypes) {
+            authorizedGrantTypeSet.add(customGrantType.getAuthorizedGrantType());
         }
         return authorizedGrantTypeSet;
     }

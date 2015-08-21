@@ -98,7 +98,18 @@
         <constructor-arg ref="clientDetails"/>
     </bean>-->
 
-    <bean id="tokenStore" class="org.springframework.security.oauth2.provider.token.InMemoryTokenStore"/>
+    <!--<bean id="tokenStore" class="org.springframework.security.oauth2.provider.token.InMemoryTokenStore"/>-->
+    <bean id="tokenStore" class="org.springframework.security.oauth2.provider.token.JdbcTokenStore">
+        <constructor-arg ref="jdbcTemplate" />
+    </bean>
+
+    <bean id="jdbcTemplate"
+          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/oauth2_demo"/>
+        <property name="username" value="root"/>
+        <property name="password" value="root"/>
+    </bean>
     <!-- Used to create token and and every thing about them except for their persistence that is reposibility of TokenStore (Given here is a 			default implementation) -->
     <bean id="tokenServices" class="org.springframework.security.oauth2.provider.token.DefaultTokenServices">
         <property name="tokenStore" ref="tokenStore"/>
@@ -120,8 +131,8 @@
         <oauth:client-credentials/>
         <oauth:password/>
     </oauth:authorization-server>
-
-    <oauth:resource-server id="resourceServerFilter" resource-id="test" token-services-ref="tokenServices"/>
+    <!--resource-id="test"-->
+    <oauth:resource-server id="resourceServerFilter"  token-services-ref="tokenServices"/>
     <!-- ClientsDeailsService: Entry Point to clients database (given is in memory implementation) -->
     <bean id="clientDetails" class="org.ateam.common.service.ClientDetailsServiceImpl"/>
 <!--    <oauth:client-details-service id="clientDetails">

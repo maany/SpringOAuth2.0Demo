@@ -1,9 +1,7 @@
 package org.ateam.common.model;
 
 import org.ateam.common.utils.ClientSpringOAuthUtils;
-import org.ateam.common.utils.CustomAuthorityUtils;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.util.StringUtils;
 
@@ -58,7 +56,7 @@ public class Client  extends BaseOpenMRSData implements ClientDetails{
     @OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
     private Collection<RedirectURI> registeredRedirectUris;
     @OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
-    private Collection<AuthorizedGrantType> authorizedGrantTypes;
+    private Collection<CustomGrantType> customGrantTypes;
 
     @Transient
     private Map<String, Object> additionalInformation = new LinkedHashMap<String, Object>();
@@ -87,13 +85,13 @@ public class Client  extends BaseOpenMRSData implements ClientDetails{
         }
 
         if (StringUtils.hasText(grantTypes)) {
-            this.authorizedGrantTypes = ClientSpringOAuthUtils.commaDelimitedStringToCollection(grantTypes,this,AuthorizedGrantType.class);
+            this.customGrantTypes = ClientSpringOAuthUtils.commaDelimitedStringToCollection(grantTypes,this,CustomGrantType.class);
         }
         else {
-            AuthorizedGrantType authorizationCode = new AuthorizedGrantType("authorization_code");
-            AuthorizedGrantType refreshToken = new AuthorizedGrantType("refresh_token");
-            this.authorizedGrantTypes.add(authorizationCode);
-            this.authorizedGrantTypes.add(refreshToken);
+            CustomGrantType authorizationCode = new CustomGrantType("authorization_code");
+            CustomGrantType refreshToken = new CustomGrantType("refresh_token");
+            this.customGrantTypes.add(authorizationCode);
+            this.customGrantTypes.add(refreshToken);
         }
 
         if (StringUtils.hasText(authorities)) {
@@ -204,8 +202,8 @@ public class Client  extends BaseOpenMRSData implements ClientDetails{
         this.registeredRedirectUris = registeredRedirectUris;
     }
 
-    public void setAuthorizedGrantTypes(Collection<AuthorizedGrantType> authorizedGrantTypes) {
-        this.authorizedGrantTypes = authorizedGrantTypes;
+    public void setCustomGrantTypes(Collection<CustomGrantType> customGrantTypes) {
+        this.customGrantTypes = customGrantTypes;
     }
 
     public void setAdditionalInformation(Map<String, Object> additionalInformation) {
@@ -251,8 +249,8 @@ public class Client  extends BaseOpenMRSData implements ClientDetails{
     }
 
     @Override
-    public Set<String> getAuthorizedGrantTypes() {
-        return ClientSpringOAuthUtils.parseAuthorizedGrantTypes(authorizedGrantTypes);
+    public Set<String> getCustomGrantTypes() {
+        return ClientSpringOAuthUtils.parseAuthorizedGrantTypes(customGrantTypes);
     }
 
     @Override
@@ -311,7 +309,7 @@ public class Client  extends BaseOpenMRSData implements ClientDetails{
         result = prime * result + ((accessTokenValiditySeconds==null) ? 0 : accessTokenValiditySeconds);
         result = prime * result + ((refreshTokenValiditySeconds == null) ? 0 : refreshTokenValiditySeconds);
         result = prime * result + ((authorities == null) ? 0 : authorities.hashCode());
-        result = prime * result + ((authorizedGrantTypes == null) ? 0 : authorizedGrantTypes.hashCode());
+        result = prime * result + ((customGrantTypes == null) ? 0 : customGrantTypes.hashCode());
         result = prime * result + ((clientIdentifier == null) ? 0 : clientIdentifier.hashCode());
         result = prime * result + ((clientSecret == null) ? 0 : clientSecret.hashCode());
         result = prime * result + ((registeredRedirectUris == null) ? 0 : registeredRedirectUris.hashCode());
@@ -340,11 +338,11 @@ public class Client  extends BaseOpenMRSData implements ClientDetails{
         }
         else if (!authorities.equals(other.authorities))
             return false;
-        if (authorizedGrantTypes == null) {
-            if (other.authorizedGrantTypes != null)
+        if (customGrantTypes == null) {
+            if (other.customGrantTypes != null)
                 return false;
         }
-        else if (!authorizedGrantTypes.equals(other.authorizedGrantTypes))
+        else if (!customGrantTypes.equals(other.customGrantTypes))
             return false;
         if (clientIdentifier == null) {
             if (other.clientIdentifier != null)
@@ -391,7 +389,7 @@ public class Client  extends BaseOpenMRSData implements ClientDetails{
         for(GrantedAuthority auth:authorities)
             auths +=auth.toString() + " ";
         return "Client [clientId=" + clientIdentifier + ", clientSecret=" + clientSecret + ", scope=" + scopes
-                + ", resourceIds=" + resources + ", authorizedGrantTypes=" + authorizedGrantTypes
+                + ", resourceIds=" + resources + ", customGrantTypes=" + customGrantTypes
                 + ", registeredRedirectUris=" + registeredRedirectUris + ", authorities=" + authorities
                 + ", accessTokenValiditySeconds=" + accessTokenValiditySeconds + ", refreshTokenValiditySeconds="
                 + refreshTokenValiditySeconds + ", additionalInformation=" + additionalInformation + "]"

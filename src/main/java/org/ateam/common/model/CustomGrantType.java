@@ -7,7 +7,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name ="oauth2_client_grant_types")
-public class AuthorizedGrantType implements Parameterized{
+public class CustomGrantType implements Parameterized{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
@@ -15,10 +15,10 @@ public class AuthorizedGrantType implements Parameterized{
     @JoinColumn(name = "client_id" )
     private Client client;
 
-    public AuthorizedGrantType() {
+    public CustomGrantType() {
     }
 
-    public AuthorizedGrantType(Client client, String grantType) {
+    public CustomGrantType(Client client, String grantType) {
         this.client = client;
         this.grantType = grantType;
     }
@@ -26,7 +26,7 @@ public class AuthorizedGrantType implements Parameterized{
     @Basic
     private String grantType;
 
-    public AuthorizedGrantType(String grantType) {
+    public CustomGrantType(String grantType) {
         this.grantType = grantType;
     }
 
